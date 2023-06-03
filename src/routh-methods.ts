@@ -1,9 +1,8 @@
 
 import { Request, Response } from 'express';
-import { getDuckDuckResultsApi, extractTitlesAndUrls } from './helper'
-import Joi from 'joi';
+import { getDuckDuckResultsApi, extractTitlesAndUrls, validateQuery, writeTopicsByQueryToFile } from './helper';
 const { STATUS_CODES } = require('./const');
-const { OK,INTERNAL_SERVER_ERROR, VALIDATION_ERROR } = STATUS_CODES;
+const { OK,INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 
 export const getDuckDuckFullResponse = async (req:Request, res:Response) => {
@@ -23,19 +22,16 @@ export const getUrlsAndTitlesRelatedTopics = async (req: Request,res: Response) 
         validateQuery(q)
         const response = await getDuckDuckResultsApi(q);
         const { RelatedTopics }  = response.data;
-        const result = extractTitlesAndUrls(RelatedTopics)
-        return res.status(OK).json(result);
+        const relatedTopicsResults = extractTitlesAndUrls(RelatedTopics)
+        writeTopicsByQueryToFile(`${q}`,relatedTopicsResults,'topicsByQuery.json')
+        return res.status(OK).json(relatedTopicsResults);
     }catch(error : any) { 
         res.status(error.response.status).json({error:error.message});  
     }
 }
 
-const validateQuery = (query : any) => {
-    const schema = Joi.string().required();
-    const response = schema.validate(query);
-    if (response.error) {
-        const error = { response: { status: VALIDATION_ERROR } , message: response.error };
-        throw error;
-    }
+export const getRelatedTopicFromFile = async (req: Request,res: Response) =>{
+
 }
+
 

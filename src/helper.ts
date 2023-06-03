@@ -1,7 +1,12 @@
 
 import axios from 'axios';
-import { Topic, NestedTopic, NewTopic } from './types'
+import { Topic, NestedTopic, ResultTopic } from './types'
 import { DUCK_DUCK_API_URL } from './const';
+import Joi from 'joi';
+import fs from 'fs';
+
+const { STATUS_CODES } = require('./const');
+const { VALIDATION_ERROR } = STATUS_CODES;
 
 export const getDuckDuckResultsApi = async (query :  any) => {
         let apiUrl = `${DUCK_DUCK_API_URL}q=${query}`;
@@ -11,15 +16,15 @@ export const getDuckDuckResultsApi = async (query :  any) => {
 
 export const extractTitlesAndUrls  = (topics :  (Topic | NestedTopic)[]) => {
     try{
-        let newTopicArr: NewTopic[] = [];
+        let resultTopicsArr: ResultTopic[] = [];
         topics.map((topic: any)=>{
              if (checkIfThereIsNestedTopics(topic)){
-                newTopicArr.push(...extractTitlesAndUrls(topic?.Topics))
+                resultTopicsArr.push(...extractTitlesAndUrls(topic?.Topics))
              }else{
-                newTopicArr.push(getTitleAndUrl(topic))
+                resultTopicsArr.push(getTitleAndUrl(topic))
              }
         }) 
-        return newTopicArr;
+        return resultTopicsArr;
      } catch(error : any){
          throw new Error(error)
     }
@@ -28,9 +33,38 @@ export const extractTitlesAndUrls  = (topics :  (Topic | NestedTopic)[]) => {
 const checkIfThereIsNestedTopics = (topic : Topic | NestedTopic) =>
     topic.hasOwnProperty('Topics')
 
-const getTitleAndUrl = (topic: Topic) : NewTopic=> {
+const getTitleAndUrl = (topic: Topic) : ResultTopic=> {
     return {
         url: topic['FirstURL'],
         title: topic['Text']
     }
 }
+
+export const validateQuery = (query : string) => {
+    const schema = Joi.string().required();
+    const response = schema.validate(query);
+    if (response.error) {
+        const error = { response: { status: VALIDATION_ERROR } , message: response.error };
+        throw error;
+    }
+}
+
+export const writeTopicsByQueryToFile = (query: string,arrayOfTopics: ResultTopic[], filename : string) => {
+    const pathFile = `./${filename}`;
+    if (arrayOfTopics.length){
+        let existingDataInFile = {};
+        if (fs.existsSync(pathFile)) {
+            const fileData = fs.readFileSync(filename, 'utf-8');
+            existingDataInFile = JSON.parse(fileData);
+        }
+        const topicsByQuery = { ...existingDataInFile, [query]: arrayOfTopics };
+        const jsonData = JSON.stringify(topicsByQuery, null, 4);     
+        fs.writeFile(filename, jsonData, (err) => {
+          if (err) {
+              throw err;
+          } else {
+            console.log(`Objects written to ${filename} successfully.`);
+          }
+        })
+    };
+  }
