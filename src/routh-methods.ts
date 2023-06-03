@@ -31,8 +31,12 @@ export const getUrlsAndTitlesRelatedTopics = async (req: Request,res: Response) 
 }
 
 export const getLastSearchesTopicsFromFile = async (req: Request,res: Response) => {
-    const lastSearchesTopic = readTopicsByQueryFromFile(FILE_NAME);
-    return res.status(OK).json(lastSearchesTopic);
-}
+    try{
+        const lastSearchesTopic = readTopicsByQueryFromFile(FILE_NAME);
+        return res.status(OK).json(lastSearchesTopic);
+    }catch(error : any){
+            res.status(INTERNAL_SERVER_ERROR).json({error:error.message});
+        }
+    }
 
 
