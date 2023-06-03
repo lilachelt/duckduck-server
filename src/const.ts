@@ -6,3 +6,5 @@ export const STATUS_CODES = {
 }
 
 export const DUCK_DUCK_API_URL = 'https://api.duckduckgo.com?format=json&'
+
+export const FILE_NAME = 'topicsByQuery.json';
