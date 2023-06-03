@@ -40,7 +40,7 @@ const getTitleAndUrl = (topic: Topic) : ResultTopic=> {
     }
 }
 
-export const validateQuery = (query : string) => {
+export const validateQuery = (query : any) => {
     const schema = Joi.string().required();
     const response = schema.validate(query);
     if (response.error) {
@@ -50,13 +50,8 @@ export const validateQuery = (query : string) => {
 }
 
 export const writeTopicsByQueryToFile = (query: string,arrayOfTopics: ResultTopic[], filename : string) => {
-    const pathFile = `./${filename}`;
     if (arrayOfTopics.length){
-        let existingDataInFile = {};
-        if (fs.existsSync(pathFile)) {
-            const fileData = fs.readFileSync(filename, 'utf-8');
-            existingDataInFile = JSON.parse(fileData);
-        }
+        const existingDataInFile = readTopicsByQueryFromFile(filename);
         const topicsByQuery = { ...existingDataInFile, [query]: arrayOfTopics };
         const jsonData = JSON.stringify(topicsByQuery, null, 4);     
         fs.writeFile(filename, jsonData, (err) => {
@@ -67,4 +62,14 @@ export const writeTopicsByQueryToFile = (query: string,arrayOfTopics: ResultTopi
           }
         })
     };
-  }
+}
+
+export const readTopicsByQueryFromFile = (filename : string) =>{
+    const pathFile = `./${filename}`;
+    let existingDataInFile = {};
+    if (fs.existsSync(pathFile)) {
+        const fileData = fs.readFileSync(filename, 'utf-8');
+        existingDataInFile = JSON.parse(fileData);
+    }
+    return existingDataInFile;
+}
