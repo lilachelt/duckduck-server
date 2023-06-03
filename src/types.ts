@@ -1,5 +1,3 @@
-import Joi from 'joi';
-const schema = Joi.string().required();
 type Icon = {
     Height: number;
     URL: string;
