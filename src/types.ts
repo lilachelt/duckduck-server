@@ -18,7 +18,7 @@ export type NestedTopic = {
     Topics:Topic[];
 }
 
-export type NewTopic = {
+export type ResultTopic = {
     url: string,
     title:string
 }
