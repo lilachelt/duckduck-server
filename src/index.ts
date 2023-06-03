@@ -1,4 +1,4 @@
-import { getDuckDuckFullResponse, getUrlsAndTitlesRelatedTopics } from './routh-methods';
+import { getDuckDuckFullResponse, getUrlsAndTitlesRelatedTopics, getLastSearchesTopicsFromFile} from './routh-methods';
 import express from 'express';
 const server = express();
 const port = process.env.NODE_PORT || 1337;
@@ -12,4 +12,5 @@ server.use(cors({
 
 server.get('/', getDuckDuckFullResponse);
 server.get('/urlsAndTitles', getUrlsAndTitlesRelatedTopics);
+server.post('/',getLastSearchesTopicsFromFile)
 

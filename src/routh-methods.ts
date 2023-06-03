@@ -1,7 +1,7 @@
 
 import { Request, Response } from 'express';
-import { getDuckDuckResultsApi, extractTitlesAndUrls, validateQuery, writeTopicsByQueryToFile } from './helper';
-const { STATUS_CODES } = require('./const');
+import { getDuckDuckResultsApi, extractTitlesAndUrls, validateQuery, writeTopicsByQueryToFile, readTopicsByQueryFromFile } from './helper';
+const { STATUS_CODES, FILE_NAME } = require('./const');
 const { OK,INTERNAL_SERVER_ERROR } = STATUS_CODES;
 
 
@@ -23,15 +23,16 @@ export const getUrlsAndTitlesRelatedTopics = async (req: Request,res: Response) 
         const response = await getDuckDuckResultsApi(q);
         const { RelatedTopics }  = response.data;
         const relatedTopicsResults = extractTitlesAndUrls(RelatedTopics)
-        writeTopicsByQueryToFile(`${q}`,relatedTopicsResults,'topicsByQuery.json')
+        writeTopicsByQueryToFile(`${q}`,relatedTopicsResults,FILE_NAME)
         return res.status(OK).json(relatedTopicsResults);
     }catch(error : any) { 
         res.status(error.response.status).json({error:error.message});  
     }
 }
 
-export const getRelatedTopicFromFile = async (req: Request,res: Response) =>{
-
+export const getLastSearchesTopicsFromFile = async (req: Request,res: Response) => {
+    const lastSearchesTopic = readTopicsByQueryFromFile(FILE_NAME);
+    return res.status(OK).json(lastSearchesTopic);
 }
 
 
