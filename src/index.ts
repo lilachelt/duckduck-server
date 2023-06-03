@@ -12,5 +12,5 @@ server.use(cors({
 
 server.get('/', getDuckDuckFullResponse);
 server.get('/urlsAndTitles', getUrlsAndTitlesRelatedTopics);
-server.post('/',getLastSearchesTopicsFromFile)
+server.post('/latestSearches',getLastSearchesTopicsFromFile)
 

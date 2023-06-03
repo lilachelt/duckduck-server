@@ -11,7 +11,6 @@ const { VALIDATION_ERROR } = STATUS_CODES;
 export const getDuckDuckResultsApi = async (query :  any) => {
         let apiUrl = `${DUCK_DUCK_API_URL}q=${query}`;
         return await axios.get(apiUrl);
-  
 }
 
 export const extractTitlesAndUrls  = (topics :  (Topic | NestedTopic)[]) => {
